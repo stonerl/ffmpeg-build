@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release tag name (default ffmpeg version)'
-        default: ''
+        description: "Release tag name (default ffmpeg version)"
+        default: ""
 
 jobs:
   build:
@@ -39,7 +39,6 @@ jobs:
             set_env('FFMPEG_VERSION', ffmpegVersion)
             set_env('RELEASE_VERSION', releaseVersion)
 
-            
       - name: Install dependencies
         run: |
           brew install autoconf
@@ -69,47 +68,44 @@ jobs:
           rm -rf ./dist/release/FFmpeg
           rm -rf ./dist/release/xcframework
 
-      
       - name: Build LGPL version
         run: |
           make build version=${{ env.RELEASE_VERSION }}
-      
-      
+
       - name: Update Package.swift
         run: |
           rm -rf ./Package.swift
           cp -f ./dist/release/Package.swift ./Package.swift
 
-          LibavcodecGPL_url="https://github.com/mpvkit/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libavcodec-GPL.xcframework.zip"
+          LibavcodecGPL_url="https://github.com/stonerl/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libavcodec-GPL.xcframework.zip"
           LibavcodecGPL_checksum=$(cat ./dist/release/Libavcodec-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libavcodec-GPL_url)#${LibavcodecGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libavcodec-GPL_checksum)#${LibavcodecGPL_checksum}#g" ./Package.swift
 
-          LibavformatGPL_url="https://github.com/mpvkit/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libavformat-GPL.xcframework.zip"
+          LibavformatGPL_url="https://github.com/stonerl/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libavformat-GPL.xcframework.zip"
           LibavformatGPL_checksum=$(cat ./dist/release/Libavformat-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libavformat-GPL_url)#${LibavformatGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libavformat-GPL_checksum)#${LibavformatGPL_checksum}#g" ./Package.swift
 
-          LibavfilterGPL_url="https://github.com/mpvkit/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libavfilter-GPL.xcframework.zip"
+          LibavfilterGPL_url="https://github.com/stonerl/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libavfilter-GPL.xcframework.zip"
           LibavfilterGPL_checksum=$(cat ./dist/release/Libavfilter-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libavfilter-GPL_url)#${LibavfilterGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libavfilter-GPL_checksum)#${LibavfilterGPL_checksum}#g" ./Package.swift
 
-          LibavutilGPL_url="https://github.com/mpvkit/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libavutil-GPL.xcframework.zip"
+          LibavutilGPL_url="https://github.com/stonerl/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libavutil-GPL.xcframework.zip"
           LibavutilGPL_checksum=$(cat ./dist/release/Libavutil-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libavutil-GPL_url)#${LibavutilGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libavutil-GPL_checksum)#${LibavutilGPL_checksum}#g" ./Package.swift
 
-          LibswresampleGPL_url="https://github.com/mpvkit/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libswresample-GPL.xcframework.zip"
+          LibswresampleGPL_url="https://github.com/stonerl/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libswresample-GPL.xcframework.zip"
           LibswresampleGPL_checksum=$(cat ./dist/release/Libswresample-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libswresample-GPL_url)#${LibswresampleGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libswresample-GPL_checksum)#${LibswresampleGPL_checksum}#g" ./Package.swift
 
-          LibswscaleGPL_url="https://github.com/mpvkit/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libswscale-GPL.xcframework.zip"
+          LibswscaleGPL_url="https://github.com/stonerl/ffmpeg-build/releases/download/${{ env.RELEASE_VERSION }}/Libswscale-GPL.xcframework.zip"
           LibswscaleGPL_checksum=$(cat ./dist/release/Libswscale-GPL.xcframework.checksum.txt)
           sed -i '' "s#\\\(Libswscale-GPL_url)#${LibswscaleGPL_url}#g" ./Package.swift
           sed -i '' "s#\\\(Libswscale-GPL_checksum)#${LibswscaleGPL_checksum}#g" ./Package.swift
-
 
       - name: Push Package.swift
         uses: EndBug/add-and-commit@v9
@@ -119,7 +115,7 @@ jobs:
             - Package.swift
           message: "chore: bump version to ${{ env.FFMPEG_VERSION }}"
           push: "origin HEAD:${{ github.ref_name }}"
-          
+
       - name: Upload binary to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -132,4 +128,3 @@ jobs:
           body: "https://github.com/FFmpeg/FFmpeg/blob/${{ env.FFMPEG_VERSION }}/Changelog\n"
           generate_release_notes: true
           fail_on_unmatched_files: true
-          
